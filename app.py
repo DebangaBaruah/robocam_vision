@@ -240,4 +240,4 @@ with gr.Blocks(
 
 
 if __name__ == "__main__":
-    demo.launch(share=False, show_error=True, theme=gr.themes.Soft())
+    demo.launch(share=False, show_error=True)
