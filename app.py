@@ -4,27 +4,38 @@ import numpy as np
 import os
 import time
 import tempfile
+import sys
 
 from utils.detectors import ObjectDetector, FireDetector, SmokeDetector, WaterFallingDetector
 from utils.robot_vision_system import RobotVisionSystem
 from utils.model_downloader import ensure_models_downloaded
 
-# Paths
+# ── Configuration ──────────────────────────────────────────────────────────
 MODEL_DIR = os.path.join(os.path.dirname(__file__), "models")
 MODEL_CFG = os.path.join(MODEL_DIR, "yolov3.cfg")
 MODEL_WEIGHTS = os.path.join(MODEL_DIR, "yolov3.weights")
 CLASSES_FILE = os.path.join(MODEL_DIR, "coco.names")
 
-# ── Global robot vision system (lazy-loaded after model download) ──
+# Global robot vision system (lazy-loaded after model download)
 _robot_vision_system = None
+_init_error = None
 
 def get_robot_vision_system():
-    global _robot_vision_system
+    """Load the robot vision system with better error handling."""
+    global _robot_vision_system, _init_error
     if _robot_vision_system is None:
-        ok = ensure_models_downloaded(MODEL_DIR, MODEL_CFG, MODEL_WEIGHTS, CLASSES_FILE)
-        if not ok:
-            raise RuntimeError("Model files could not be downloaded. Check your internet connection.")
-        _robot_vision_system = RobotVisionSystem(MODEL_CFG, MODEL_WEIGHTS, CLASSES_FILE)
+        try:
+            print("[App] Initializing models...", file=sys.stderr)
+            ok = ensure_models_downloaded(MODEL_DIR, MODEL_CFG, MODEL_WEIGHTS, CLASSES_FILE)
+            if not ok:
+                raise RuntimeError("Model files could not be downloaded.")
+            print("[App] Models downloaded successfully", file=sys.stderr)
+            _robot_vision_system = RobotVisionSystem(MODEL_CFG, MODEL_WEIGHTS, CLASSES_FILE)
+            print("[App] System ready!", file=sys.stderr)
+        except Exception as e:
+            _init_error = str(e)
+            print(f"[App] Initialization error: {e}", file=sys.stderr)
+            raise
     return _robot_vision_system
 
 

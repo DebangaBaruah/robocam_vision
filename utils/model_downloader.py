@@ -22,18 +22,31 @@ MIN_FILE_SIZES = {
 
 def _download(url: str, dest: str):
     print(f"[Downloader] Downloading {os.path.basename(dest)} …")
+    print(f"[Downloader] URL: {url}")
     req = urllib.request.Request(url, headers={
         "User-Agent": "Mozilla/5.0",
         "Accept": "*/*",
     })
-    with urllib.request.urlopen(req, timeout=120) as response:
-        with open(dest, "wb") as out_file:
-            while True:
-                chunk = response.read(8192)
-                if not chunk:
-                    break
-                out_file.write(chunk)
-    print(f"[Downloader] ✓ Saved to {dest}")
+    try:
+        with urllib.request.urlopen(req, timeout=300) as response:
+            total_size = int(response.getheader('Content-Length', 0))
+            downloaded = 0
+            with open(dest, "wb") as out_file:
+                while True:
+                    chunk = response.read(65536)
+                    if not chunk:
+                        break
+                    out_file.write(chunk)
+                    downloaded += len(chunk)
+                    if total_size > 0:
+                        percent = (downloaded / total_size) * 100
+                        mb_downloaded = downloaded / 1024 / 1024
+                        print(f"[Downloader] {os.path.basename(dest)}: {percent:.1f}% ({mb_downloaded:.1f} MB)")
+    except Exception as e:
+        if os.path.exists(dest):
+            os.remove(dest)
+        raise e
+    print(f"[Downloader] Saved to {dest}")
 
 
 def _normalize_names_file(model_dir: str, names: str) -> str:
