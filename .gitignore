@@ -1,0 +1,49 @@
+
+# YOLOv3 Model Files
+models/yolov3.weights
+models/yolov3.cfg
+models/coco.names
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Environment
+.env
+.venv
+venv/
+ENV/
+env/
+
+# Output videos and test files
+outputs/
+*.mp4
+*.avi
+*.mov
+test.jpg
+test.weights
+tmp_test_detector.py
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+*.tmp
+.ipynb_checkpoints/
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
