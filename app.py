@@ -186,7 +186,6 @@ with gr.Blocks(
                 fn=process_webcam_frame,
                 inputs=[webcam_input, webcam_confidence, webcam_objects, webcam_fire, webcam_smoke, webcam_water],
                 outputs=[webcam_output],
-                time_limit=30,
                 stream_every=0.5  # Process every 0.5 seconds for better performance
             )
 
