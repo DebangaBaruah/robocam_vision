@@ -23,7 +23,7 @@ _init_error = None
 def get_robot_vision_system():
     """Load the robot vision system with better error handling."""
     global _robot_vision_system, _init_error
-    if _robot_vision_system is None:
+    if _robot_vision_system is None and _init_error is None:
         try:
             print("[App] Initializing models...", file=sys.stderr)
             ok = ensure_models_downloaded(MODEL_DIR, MODEL_CFG, MODEL_WEIGHTS, CLASSES_FILE)
@@ -35,7 +35,8 @@ def get_robot_vision_system():
         except Exception as e:
             _init_error = str(e)
             print(f"[App] Initialization error: {e}", file=sys.stderr)
-            raise
+            # Don't re-raise for Spaces - let the app start with error handling
+            return None
     return _robot_vision_system
 
 
@@ -48,6 +49,8 @@ def process_video(input_video_path, confidence_threshold=0.5, skip_frames=2,
 
     try:
         system = get_robot_vision_system()
+        if system is None:
+            return None, f"❌ System initialization failed: {_init_error}"
     except RuntimeError as e:
         return None, f"❌ Model load error: {e}"
 
@@ -126,6 +129,8 @@ def process_webcam_frame(frame, confidence_threshold=0.5,
 
     try:
         system = get_robot_vision_system()
+        if system is None:
+            return frame  # Return original frame if system not initialized
     except RuntimeError:
         return frame  # Return original frame if model not loaded
 
