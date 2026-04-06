@@ -1,4 +1,4 @@
-gradio==4.4.1
+gradio>=4.36.0
 opencv-python-headless>=4.8.0
 numpy>=1.24.0
-huggingface_hub<0.20
+huggingface_hub>=0.16,<0.23
